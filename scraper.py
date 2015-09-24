@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import json
+import datetime
 from dateutil import parser
 
 url='https://www.iwight.com/licensing/licenceconsultationlist.aspx'
@@ -94,6 +95,7 @@ latlonlookup=postcodeStripPatcher(latlonlookup,'Devonia Slipway, Esplanade, Sand
 df['lat']=df['address'].apply(lambda x: latlonlookup[x]['lat'])
 df['lon']=df['address'].apply(lambda x: latlonlookup[x]['lon'])
 df['end_consultation_t']=df['end_consultation'].apply(lambda x: parser.parse(x, dayfirst=True))
+df['end_consultation_t']= df['end_consultation_t'].apply(lambda x: datetime.date(x.year,x.month,x.day))
 
 dt="CREATE TABLE IF NOT EXISTS 'IWLICENSEAPPLICATIONS' ('address' text,'end_consultation' text,'licence' text,'name' text,'number' text,'stub' text,'lat' real,'lon' real,'end_consultation_t' text)"
 scraperwiki.sqlite.execute(dt)
