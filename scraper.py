@@ -86,6 +86,7 @@ def licenseScraper(ltype='Premises'):
 	r=requests.post(url,data=params)
 
 	df=licenseConsultations(r.content)
+	if len(df)==0: return
 	latlonlookup={}
 	for addr in df['address'].unique():
 		g=geocoder2(addr)
@@ -107,6 +108,7 @@ def licenseScraper(ltype='Premises'):
 	t='IWLICENSEAPPLICATIONS'
 	if len(df)>0:
 	  scraperwiki.sqlite.save(unique_keys=['number'],table_name=t, data=df.to_dict(orient='records'))
+	return
 
 for l in ['Premises','Sex Establishments','Street Trading','Street Furniture']:
         licenseScraper(l)
