@@ -99,5 +99,5 @@ dt="CREATE TABLE IF NOT EXISTS 'IWLICENSEAPPLICATIONS' ('address' text,'end_cons
 scraperwiki.sqlite.execute(dt)
 
 t='IWLICENSEAPPLICATIONS'
-if d != []:
+if len(df)>0:
   scraperwiki.sqlite.save(unique_keys=['number'],table_name=t, data=df.to_dict(orient='records'))
