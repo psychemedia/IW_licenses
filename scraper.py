@@ -9,20 +9,6 @@ from dateutil import parser
 url='https://www.iwight.com/licensing/licenceconsultationlist.aspx'
 response =requests.get(url)
 
-soup=BeautifulSoup(response.content)
-viewstate = soup.find('input' , id ='__VIEWSTATE')['value']
-eventvalidation=soup.find('input' , id ='__EVENTVALIDATION')['value']
-viewstategenerator=soup.find('input' , id ='__VIEWSTATEGENERATOR')['value']
-
-params={'__VIEWSTATE':viewstate,
-        '__VIEWSTATEGENERATOR':viewstategenerator,
-        '__EVENTVALIDATION':eventvalidation,
-        'q':'Search the site...',
-        'ddlList':'Premises',
-        'btnViewReg':'View Applications'}
-
-r=requests.post(url,data=params)
-
 
 def licenseConsultations(p):
     data=[]
@@ -47,8 +33,6 @@ def licenseConsultations(p):
         #    data[cn+'_t']=None
     return pd.DataFrame(data)
 
-
-df=licenseConsultations(r.content)
 
 #Use nominatim for now
 def geocoder(addr):
@@ -76,13 +60,6 @@ def geocoder2(addr):
         retval=jdata[0]
     return retval
 
-latlonlookup={}
-for addr in df['address'].unique():
-    g=geocoder2(addr)
-    if 'geometry' in g:
-        latlonlookup[addr]={'all':g,'lat':g['geometry']['location']['lat'],'lon':g['geometry']['location']['lng']}
-    else:
-        latlonlookup[addr]={'all':None,'lat':None,'lon':None}
 
 
 def postcodeStripPatcher(latlonlookup,addr):
@@ -90,16 +67,44 @@ def postcodeStripPatcher(latlonlookup,addr):
     g=geocoder2(addr2)
     latlonlookup[addr]={'all':g,'lat':g['geometry']['location']['lat'],'lon':g['geometry']['location']['lng']}
     return latlonlookup
-latlonlookup=postcodeStripPatcher(latlonlookup,'Devonia Slipway, Esplanade, Sandown, Isle of Wight, PO36 8NJ')
 
-df['lat']=df['address'].apply(lambda x: latlonlookup[x]['lat'])
-df['lon']=df['address'].apply(lambda x: latlonlookup[x]['lon'])
-df['end_consultation_t']=df['end_consultation'].apply(lambda x: parser.parse(x, dayfirst=True))
-df['end_consultation_t']= df['end_consultation_t'].apply(lambda x: datetime.date(x.year,x.month,x.day))
+def licenseScraper(ltype='Premises'):
+	soup=BeautifulSoup(response.content)
+	viewstate = soup.find('input' , id ='__VIEWSTATE')['value']
+	eventvalidation=soup.find('input' , id ='__EVENTVALIDATION')['value']
+	viewstategenerator=soup.find('input' , id ='__VIEWSTATEGENERATOR')['value']
 
-dt="CREATE TABLE IF NOT EXISTS 'IWLICENSEAPPLICATIONS' ('address' text,'end_consultation' text,'licence' text,'name' text,'number' text,'stub' text,'lat' real,'lon' real,'end_consultation_t' text)"
-scraperwiki.sqlite.execute(dt)
+	params={'__VIEWSTATE':viewstate,
+			'__VIEWSTATEGENERATOR':viewstategenerator,
+			'__EVENTVALIDATION':eventvalidation,
+			'q':'Search the site...',
+			'ddlList':ltype,
+			'btnViewReg':'View Applications'}
 
-t='IWLICENSEAPPLICATIONS'
-if len(df)>0:
-  scraperwiki.sqlite.save(unique_keys=['number'],table_name=t, data=df.to_dict(orient='records'))
+	r=requests.post(url,data=params)
+
+	df=licenseConsultations(r.content)
+	latlonlookup={}
+	for addr in df['address'].unique():
+		g=geocoder2(addr)
+		if 'geometry' in g:
+			latlonlookup[addr]={'all':g,'lat':g['geometry']['location']['lat'],'lon':g['geometry']['location']['lng']}
+		else:
+			latlonlookup[addr]={'all':None,'lat':None,'lon':None}
+
+	#latlonlookup=postcodeStripPatcher(latlonlookup,'Devonia Slipway, Esplanade, Sandown, Isle of Wight, PO36 8NJ')
+        df['licenseType']=ltype
+	df['lat']=df['address'].apply(lambda x: latlonlookup[x]['lat'])
+	df['lon']=df['address'].apply(lambda x: latlonlookup[x]['lon'])
+	df['end_consultation_t']=df['end_consultation'].apply(lambda x: parser.parse(x, dayfirst=True))
+	df['end_consultation_t']= df['end_consultation_t'].apply(lambda x: datetime.date(x.year,x.month,x.day))
+
+	dt="CREATE TABLE IF NOT EXISTS 'IWLICENSEAPPLICATIONS' ('address' text,'end_consultation' text,'licence' text,'name' text,'number' text,'stub' text,'lat' real,'lon' real,'end_consultation_t' text)"
+	scraperwiki.sqlite.execute(dt)
+
+	t='IWLICENSEAPPLICATIONS'
+	if len(df)>0:
+	  scraperwiki.sqlite.save(unique_keys=['number'],table_name=t, data=df.to_dict(orient='records'))
+
+for l in ['Premises','Sex Establishments','Street Trading','Street Furniture']:
+        licenseScraper(l)
