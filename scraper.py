@@ -12,7 +12,9 @@ response =requests.get(url)
 
 def licenseConsultations(p):
     data=[]
-    t=BeautifulSoup(p).find('div',id='pnlResults').find('table')
+    t=BeautifulSoup(p).find('div',id='pnlResults')
+    if t is not None: t=t.find('table')
+    else: return pd.DataFrame()
     rows=t.findAll('tr')
     cells=rows[0].findAll('td')
     head=[c.text for c in cells]
