@@ -109,7 +109,7 @@ def licenseScraper(ltype='Premises'):
 	dfd=df.to_dict(orient='records')
 	newRecords=[]
 	for r in dfd:
-		if len(scraperwiki.sqlite.select("* from {t} where number={n}".format(t=t,n=r['number']))==0:
+		if len(scraperwiki.sqlite.select("* from {t} where number='{n}'".format(t=t,n=r['number']))==0:
 			print('First seen',r)
 			r['firstSeen']=datetime.datetime.utcnow()
 			newRecords.append(r)
