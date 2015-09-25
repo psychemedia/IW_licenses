@@ -106,8 +106,15 @@ def licenseScraper(ltype='Premises'):
 	scraperwiki.sqlite.execute(dt)
 
 	t='IWLICENSEAPPLICATIONS'
-	if len(df)>0:
-	  scraperwiki.sqlite.save(unique_keys=['number'],table_name=t, data=df.to_dict(orient='records'))
+	dfd=df.to_dict(orient='records')
+	newRecords=[]
+	for r in dfd:
+		if len(scraperwiki.sqlite.select("* from {t} where number={n}".format(t=t,n=r['number']))==0:
+			print('First seen',r)
+			r['firstSeen']=datetime.datetime.utcnow()
+	if len(newRecords):
+		print('Adding {} new records'.format(len(newRecords))
+		scraperwiki.sqlite.save(unique_keys=['number'],table_name=t, data=newRecords)
 	return
 
 for l in ['Premises','Sex Establishments','Street Trading','Street Furniture']:
