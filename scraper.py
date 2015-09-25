@@ -113,7 +113,7 @@ def licenseScraper(ltype='Premises'):
 			print('First seen',r)
 			r['firstSeen']=datetime.datetime.utcnow()
 			newRecords.append(r)
-	if len(newRecords):
+	if len(newRecords)>0:
 		print('Adding {} new records'.format(len(newRecords))
 		scraperwiki.sqlite.save(unique_keys=['number'],table_name=t, data=newRecords)
 	return
