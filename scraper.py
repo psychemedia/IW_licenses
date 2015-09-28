@@ -108,8 +108,11 @@ def licenseScraper(ltype='Premises'):
 	t='IWLICENSEAPPLICATIONS'
 	dfd=df.to_dict(orient='records')
 	newRecords=[]
+	cases=[x['number'] for x in scraperwiki.sqlite.select("number from {t}".format(t=t))]
+	#for r in dfd:
+		#if len(scraperwiki.sqlite.select("* from {t} where number='{n}'".format(t=t,n=r['number'])))==0:
 	for r in dfd:
-		if len(scraperwiki.sqlite.select("* from {t} where number='{n}'".format(t=t,n=r['number'])))==0:
+		if r['number'] not in cases:
 			print('First seen',r)
 			r['firstSeen']=datetime.datetime.utcnow()
 			newRecords.append(r)
