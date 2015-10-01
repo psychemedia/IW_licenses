@@ -90,7 +90,7 @@ def licenseScraper(ltype='Premises'):
 	latlonlookup={}
 	for addr in df['address'].unique():
 		g=geocoder2(addr)
-		if 'geometry' in g:
+		if g is not None and 'geometry' in g:
 			latlonlookup[addr]={'all':g,'lat':g['geometry']['location']['lat'],'lon':g['geometry']['location']['lng']}
 		else:
 			latlonlookup[addr]={'all':None,'lat':None,'lon':None}
