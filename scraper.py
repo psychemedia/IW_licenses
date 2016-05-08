@@ -112,7 +112,7 @@ def licenseScraper(ltype='Premises'):
 	#for r in dfd:
 		#if len(scraperwiki.sqlite.select("* from {t} where number='{n}'".format(t=t,n=r['number'])))==0:
 	for r in dfd:
-		if r['number'] not in cases:
+		if 'number' in r and r['number'] not in cases:
 			print('First seen',r)
 			r['firstSeen']=datetime.datetime.utcnow()
 			newRecords.append(r)
