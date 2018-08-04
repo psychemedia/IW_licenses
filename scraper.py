@@ -1,3 +1,9 @@
+#numpy in py3.6 throwing warnings
+import warnings
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
+
 import scraperwiki
 import requests
 from bs4 import BeautifulSoup
