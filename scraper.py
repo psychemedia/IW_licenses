@@ -97,7 +97,7 @@ def licenseScraper(ltype='Premises'):
 			'ddlList':ltype,
 			'btnViewReg':'View Applications'}
 
-	r=session.post(url,data=params)
+	r=session.post(url,headers=headers,data=params)
 
 	df=licenseConsultations(r.content)
 	if len(df)==0: return
