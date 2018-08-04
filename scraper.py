@@ -9,6 +9,14 @@ from dateutil import parser
 url='https://www.iwight.com/licensing/licenceconsultationlist.aspx'
 response =requests.get(url)
 
+session = requests.Session()
+headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'}
+session.headers.update(headers)
+
+response =session.get(url)
+headers['Referer'] = response.request.url
+headers['Origin']= 'https://www.iow.gov.uk'
+headers['Host']= 'www.iow.gov.uk'
 
 def licenseConsultations(p):
     data=[]
@@ -83,7 +91,7 @@ def licenseScraper(ltype='Premises'):
 			'ddlList':ltype,
 			'btnViewReg':'View Applications'}
 
-	r=requests.post(url,data=params)
+	r=session.post(url,data=params)
 
 	df=licenseConsultations(r.content)
 	if len(df)==0: return
