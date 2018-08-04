@@ -104,7 +104,7 @@ def licenseScraper(ltype='Premises'):
 			latlonlookup[addr]={'all':None,'lat':None,'lon':None}
 
 	#latlonlookup=postcodeStripPatcher(latlonlookup,'Devonia Slipway, Esplanade, Sandown, Isle of Wight, PO36 8NJ')
-        df['licenseType']=ltype
+	df['licenseType']=ltype
 	df['lat']=df['address'].apply(lambda x: latlonlookup[x]['lat'])
 	df['lon']=df['address'].apply(lambda x: latlonlookup[x]['lon'])
 	df['end_consultation_t']=df['end_consultation'].apply(lambda x: parser.parse(x, dayfirst=True))
