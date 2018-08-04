@@ -20,7 +20,7 @@ headers['Host']= 'www.iow.gov.uk'
 
 def licenseConsultations(p):
     data=[]
-    t=BeautifulSoup(p).find('div',id='pnlResults')
+    t=BeautifulSoup(p, features="lxml").find('div',id='pnlResults')
     if t is not None: t=t.find('table')
     else: return pd.DataFrame()
     rows=t.findAll('tr')
@@ -79,7 +79,7 @@ def postcodeStripPatcher(latlonlookup,addr):
     return latlonlookup
 
 def licenseScraper(ltype='Premises'):
-	soup=BeautifulSoup(response.content)
+	soup=BeautifulSoup(response.content, features="lxml")
 	viewstate = soup.find('input' , id ='__VIEWSTATE')['value']
 	eventvalidation=soup.find('input' , id ='__EVENTVALIDATION')['value']
 	viewstategenerator=soup.find('input' , id ='__VIEWSTATEGENERATOR')['value']
