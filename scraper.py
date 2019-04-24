@@ -12,7 +12,9 @@ import json
 import datetime
 from dateutil import parser
 
-url='https://www.iwight.com/licensing/licenceconsultationlist.aspx'
+#url='https://www.iwight.com/licensing/licenceconsultationlist.aspx'
+#URL has updated to the following - the rest of the script may need revising as a result
+url='https://publicaccess.iow.gov.uk/online-applications/search.do?action=simple&searchType=LicencingApplication'
 response =requests.get(url)
 
 session = requests.Session()
